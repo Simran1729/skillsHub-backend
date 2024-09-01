@@ -81,3 +81,21 @@ exports.isInstructor = (req, res, next) => {
 }
 
 
+exports.isAdmin = (req, res, next) => {
+    try{
+        if(req.user.accountType !== 'Admin'){
+            return res.status(401).json({
+                success : false,
+                message : "This is a protected route for Admin"
+            })
+        }
+
+        next();
+    }
+    catch(err){
+        return res.status(500).json({
+            success : false,
+            message : "Error occured whlie Admin authorization"
+        })
+    }
+}

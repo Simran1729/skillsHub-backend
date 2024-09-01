@@ -138,6 +138,7 @@ exports.login = async(req , res) => {
             
             const payload = {
                 firstName : user.firstName,
+                lastName : user.lastName,
                 email : user.email,
                 id : user._id,
                 accountType : user.accountType
