@@ -198,7 +198,7 @@ exports.changePassword = async (req, res) => {
 
         if(user){
             //check if existing password matches
-            if(bcrypt.compare(password, user.password)){
+            if(await bcrypt.compare(password, user.password)){
                 //password mathced -->  reset the password
                 const newHashedPassword = await bcrypt.hash(newPassword, 10)
                 await USERS.findOneAndUpdate({email : email}, { password : newHashedPassword}, {new : true})
