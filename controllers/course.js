@@ -5,17 +5,23 @@ const SECTIONS = require('../models/Section')
 const SUBSECTIONS = require('../models/SubSection')
 const {uploadToCloudinary} = require('../utils/imageUploader')
 
+
+//TODO : write handler for getting most popular courses
+//TODO : Write handler for getting get started with these courses
+//TODO : handler for getting courses of a particular category
+
+
 exports.createCourse = async (req, res) => {
     try{
 
-        const{name , description, whatYouWillLearn, price, category} = req.body;
+        const{name , description, whatYouWillLearn, price, category, tags} = req.body;
         const thumbnail = req.files.thumbnail
 
         const instructor_id = req.user.id 
 
         const instructorDetails = USERS.findById(instructor_id)
 
-        if(!name || !description || !whatYouWillLearn || !price || !thumbnail || !category){
+        if(!name || !description || !whatYouWillLearn || !price || !thumbnail || !category || !tags){
             return res.status(400).json({
                 success : false,
                 message : "please fill all the deatils to create a course"
@@ -40,7 +46,8 @@ exports.createCourse = async (req, res) => {
                                             whatYouWillLearn : whatYouWillLearn,
                                             price : price,
                                             thumbnail : imageUploadResponse.secure_url,
-                                            category : categoryDetails._id
+                                            category : categoryDetails._id,
+                                            tags : tags
         })
 
         //update the user's ( For instructors) courses array in db as new course is created
@@ -108,3 +115,50 @@ exports.getAllCourses = async (req, res) => {
 }
 
 
+
+exports.getCourseDetails = async(req, res) => {
+    try{
+        const {courseId} = req.body;
+        
+        const course = await COURSES.find({_id : courseId})
+                                        .populate(
+                                            {
+                                                path : "instructor",
+                                                populate : {
+                                                    path : "additionalDetails",
+                                                },
+                                            }
+                                        )
+                                        .populate("category")
+                                        .populate("ratingAndReviews")
+                                        .populate({
+                                            path : "courseContent",
+                                            populate : {
+                                                path : "SubSection"
+                                            },
+                                        })
+                                        .exec();
+
+
+        if(!course){
+            return res.status(404).json({
+                success : false,
+                message : "Course not found"
+            })
+        }
+
+
+        return res.status(200).json({
+            success : true,
+            message : "Course detailes fetched",
+            data : course
+        })
+
+
+    } catch(err){
+        return res.status(500).json({
+            success : false,
+            message : err.message
+        })
+    }
+}

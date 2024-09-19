@@ -20,7 +20,7 @@ function generateOTP() {
 exports.signUp = async(req, res) => {
 
     try{
-        const {firstName, lastName, email, password, confirmPassword, accountType, otp, contactNumber, gender} = req.body;
+        const {firstName, lastName, email, password, confirmPassword, accountType, otp, gender} = req.body;
         if(!email || !firstName || !password || !accountType || !lastName || !confirmPassword || !otp || !gender){
             return res.status(401).json({
                 success : false,

@@ -1,6 +1,7 @@
 const USERS = require('../models/User')
 const PROFILES = require('../models/Profile')
 const COURSES = require('../models/Course')
+const mongoose = require('mongoose')
 
 exports.updateProfile = async (req, res) => {
     try{
@@ -64,11 +65,14 @@ exports.deleteAccount = async (req, res) => {
 
         const profileid = userDetails.additionalDetails
 
+        //convert my strings userid to mongoose object id
+        const user_object_id = mongoose.Types.ObjectId(userId)
+
         //delete the user from course's enrolled students array
         await COURSES.updateMany(
-          { studentsEnrolled : userId},
+          { studentsEnrolled : user_object_id},
           {
-            $pull : { studentsEnrolled : userId}
+            $pull : { studentsEnrolled : user_object_id}
           }
         );
 

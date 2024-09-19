@@ -29,3 +29,5 @@ const mailSender = async (email, body, title) => {
 
 module.exports = mailSender;
 
+
+//make a template for mails that will be sent
