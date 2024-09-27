@@ -6,6 +6,7 @@ exports.auth = (req , res, next) => {
     // get the token
     try{
 
+        console.log("auth")
         //get token from either body or header or cookie
         const token = req.body.token || req.cookies.token || req.header("Authorization").replace("Bearer", "");
 

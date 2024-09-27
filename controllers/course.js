@@ -28,7 +28,7 @@ exports.createCourse = async (req, res) => {
             })
         }
 
-        const categoryDetails = await CATEGORIES.findById(category)
+        const categoryDetails = await CATEGORIES.findOne({ name: category });
         if(!categoryDetails){
             return res.status(400).json({
                 success : false,
@@ -63,7 +63,7 @@ exports.createCourse = async (req, res) => {
 
         //update CATEGORIES too
         await CATEGORIES.findByIdAndUpdate(
-            {_id : category},
+            {_id : categoryDetails._id},
             {
                 $push : {
                     courses : newCourse._id, 

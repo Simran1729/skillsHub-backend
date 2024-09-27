@@ -1,21 +1,40 @@
 const mongoose = require("mongoose");
 const mailSender = require("../utils/mailSender");
 
+// const otpSchema = new mongoose.Schema({
+//     email : {
+//         type : String,
+//         required : true,
+//     },
+//     otp : {
+//         type : String,
+//         required : true,
+//     },
+//     createdAt : {
+//         type : Date,
+//         default : Date.now(),
+//         index: { expires: '5m' }
+//     }
+// });
+
 const otpSchema = new mongoose.Schema({
-    email : {
-        type : String,
-        required : true,
+    email: {
+        type: String,
+        required: true,
     },
-    otp : {
-        type : String,
-        required : true,
+    otp: {
+        type: String,
+        required: true,
     },
-    createdAt : {
-        type : Date,
-        default : Date.now(),
-        expires : 5*60 //will expire in 5 mintues and will be deleted
+    createdAt: {
+        type: Date,
+        default: Date.now, // Use Date.now without parentheses
     }
 });
+
+// Add the index to the schema
+otpSchema.index({ createdAt: 1 }, { expireAfterSeconds: 300 }); // 300 seconds = 5 minutes
+
 
 // pre hook to send verification email
 async function sendVerificationMail (email, otp) {

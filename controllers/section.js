@@ -27,7 +27,7 @@ exports.createSection = async (req, res) => {
             model :'Section',
             populate : {
                 path : 'subSection',
-                model : 'Su bSection'
+                model : 'SubSection'
             }
         }).exec();
 
