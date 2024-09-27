@@ -183,49 +183,56 @@ exports.login = async(req , res) => {
 
 
 exports.changePassword = async (req, res) => {
-    try{
-        const {email, password, newPassword, accountType} = req.body
+	try {
+		// Get user data from req.user
+		const userDetails = await USERS.findById(req.user.id);
 
-        if(!email || !password || !accountType){
-            return res.status(400).json({
-                success : false,
-                message : "fill complete details"
-            })
-        }
-        
-        //check if user exists
-        const user = await USERS.findOne({email, accountType})
+		// Get old password, new password, and confirm new password from req.body
+		const { oldPassword, newPassword, confirmNewPassword } = req.body;
 
-        if(user){
-            //check if existing password matches
-            if(await bcrypt.compare(password, user.password)){
-                //password mathced -->  reset the password
-                const newHashedPassword = await bcrypt.hash(newPassword, 10)
-                await USERS.findOneAndUpdate({email : email}, { password : newHashedPassword}, {new : true})
-                return res.status(200).json({
-                    success : true,
-                    message : "Password change successful"
-                })
-            }else{
-                return res.status(400).json({
-                    success: false,
-                    message : "password doensn't match"
-                })
-            }
-        }else{
-            return res.status(404).json({
-                success : false,
-                message : "user not found"
-            })
-        }
-    }
-    catch(err){
-        res.status(500).json({
-            "message" : "error changing the password",
-            "error" : err.message
-        })
-    }
-}
+		// Validate old password
+		const isPasswordMatch = await bcrypt.compare(
+			oldPassword,
+			userDetails.password
+		);
+		if (!isPasswordMatch) {
+			// If old password does not match, return a 401 (Unauthorized) error
+			return res
+				.status(401)
+				.json({ success: false, message: "The password is incorrect" });
+		}
+
+		// Match new password and confirm new password
+		if (newPassword !== confirmNewPassword) {
+			// If new password and confirm new password do not match, return a 400 (Bad Request) error
+			return res.status(400).json({
+				success: false,
+				message: "The password and confirm password does not match",
+			});
+		}
+
+		// Update password
+		const encryptedPassword = await bcrypt.hash(newPassword, 10);
+		const updatedUserDetails = await User.findByIdAndUpdate(
+			req.user.id,
+			{ password: encryptedPassword },
+			{ new: true }
+		);
+
+		// Return success response
+		return res
+			.status(200)
+			.json({ success: true, message: "Password updated successfully" });
+	} catch (error) {
+		// If there's an error updating the password, log the error and return a 500 (Internal Server Error) error
+		console.error("Error occurred while updating password:", error);
+		return res.status(500).json({
+			success: false,
+			message: "Error occurred while updating password",
+			error: error.message,
+		});
+	}
+};
 
 
 exports.sendOTP = async (req, res) => {

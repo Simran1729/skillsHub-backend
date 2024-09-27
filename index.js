@@ -7,6 +7,10 @@ const { dbConnection } = require('./config/database')
 require('dotenv').config();
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
+const userRoutes = require("./routes/user")
+const paymentRoutes = require('./routes/payments')
+const profileRoutes = require('./routes/profile')
+const courseRoutes = require('./routes/courses')
 
 
 connectCloudinary();
@@ -31,10 +35,10 @@ app.use(
 
 
 //routes
-// app.use("api/v1/auth", userRoutes)
-// app.use("api/v1/profile", profileRoutes)
-// app.use("api/v1/course", courseRoutes)
-// app.use("api/v1/payment", paymentRoutes)
+app.use("api/v1/auth", userRoutes)
+app.use("api/v1/profile", profileRoutes)
+app.use("api/v1/course", courseRoutes)
+app.use("api/v1/payment", paymentRoutes)
 
 
 app.get('/', (req, res) => {
